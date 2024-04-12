@@ -124,6 +124,16 @@ There are additional specific types of Column; ```NumberColumn```, ```DateColumn
 ___
 
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Arm092\LivewireDatatables\DateColumn;
+use Arm092\LivewireDatatables\LabelColumn;
+use Arm092\LivewireDatatables\NumberColumn;
+use Arm092\LivewireDatatables\BooleanColumn;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+
 class ComplexDemoTable extends LivewireDatatable
 {
 
@@ -238,6 +248,11 @@ When you have a very big table with a lot of columns, it is possible to create '
 You can human-readable labels and translations of your groups via the `groupLabels` property of your table:
 
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+
 class GroupDemoTable extends LivewireDatatable
 {
     public array $groupLabels = [
@@ -331,7 +346,11 @@ them with each other, you can use the CanPinRecords trait. Ensure to have at lea
 so the user can select records:
 
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
 use Arm092\LivewireDatatables\Traits\CanPinRecords;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 
 class RecordTable extends LivewireDatatable
 {
@@ -384,6 +403,11 @@ Callbacks give you the freedom to perform any mutations you like on the data bef
 - Callbacks can be defined inline as below, or as public methods on the Datatable class, referenced by passing the name as a string as the second argument to the callback method.
 - If you want to format the result differently for export, use ```->exportCallback(Closure $callback)```.
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+
 class CallbackDemoTable extends LivewireDatatable
 {
     public string|null|Model $model = User::class
@@ -416,6 +440,13 @@ If you want to have a default filter applied to your table, you can use the `def
 In the example below, the table will by default be filtered by rows where the _deleted_at_ column is false. If the user has a persisted filter for the _deleted_at_ column, the default filter will be ignored.
 
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Arm092\LivewireDatatables\BooleanColumn;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+
 class CallbackDemoTable extends LivewireDatatable
 {
     public array $defaultFilters = [
@@ -442,6 +473,11 @@ You can specify that a column's output is piped directly into a separate blade v
 - Template is specified using ususal laravel view helper syntax
 - Views will receive the column's value as ```$value```, and the whole query row as ```$row```
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+
 class CallbackDemoTable extends LivewireDatatable
 {
     public string|null|Model $model = User::class
@@ -469,9 +505,13 @@ You can mark a column as editable using ```editable```
 This uses the ```view()``` method above to pass the data into an Alpine/Livewire compnent that can directly update the underlying database data. Requires the column to have ```column``` defined using standard Laravel naming. This is included as an example. Much more comprehensive custom editable columns with validation etc can be built using the callback or view methods above.
 
 ```php
+
+use Arm092\LivewireDatatables\Column;
+use Illuminate\Database\Eloquent\Model;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+
 class EditableTable extends LivewireDatatable
 {
-
     public string|null|Model $model = User::class;
 
     public function getColumns(): array|Model
@@ -527,11 +567,15 @@ This example shows saving queries using a conventional Laravel ComplexQuery mode
 ```php
 /* Migration */
 
-class CreateComplexQueriesTable extends Migration
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
 {
     public function up()
     {
-        Schema::create('complex_queries', function (Blueprint $table) {
+        Schema::create('complex_queries', static function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id');
             $table->string('table');
@@ -540,12 +584,17 @@ class CreateComplexQueriesTable extends Migration
             $table->timestamps();
         });
     }
-}
+    
+    public function down(): void
+    {
+        Schema::dropIfExists('complex_queries');
+    }
+};
 
 
 /* Model */
 
-class ComplexQuery extends BaseModel
+class ComplexQuery extends Model
 {
     protected $casts = ['rules' => 'array'];
 
